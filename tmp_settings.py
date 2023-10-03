@@ -1,0 +1,6 @@
+TOKEN = '123'
+ADMIN_USER_IDS = [123]
+
+WEBHOOK_PATH = f"/bot/{TOKEN}"
+WEBHOOK_URL = "https://123.app" + WEBHOOK_PATH
+
