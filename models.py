@@ -9,7 +9,7 @@ class Services(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, unique=True)
     title = Column(String(255), nullable=False, unique=True)
     description = Column(Text, nullable=True)
-    cost = Column(Integer, default=0, nullable=False)
+    cost = Column(String(50), nullable=False)
 
 
 class Clients(Base):
