@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from aiogram import types
-from settings import ADMIN_USER_IDS, WEBHOOK_PATH, WEBHOOK_URL
+from settings import ADMIN_USER_IDS, WEBHOOK_PATH, WEBHOOK_URL, NEED_DB
 from bot import dp, bot, TOKEN
 from db import engine
 from models import Base, Services
@@ -12,9 +12,10 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+    if NEED_DB:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.create_all)
     webhook_info = await bot.get_webhook_info()
     if webhook_info.url != WEBHOOK_URL:
         await bot.set_webhook(
