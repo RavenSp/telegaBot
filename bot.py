@@ -20,9 +20,6 @@ bot = Bot(token=TOKEN, parse_mode='HTML')
 dp = Dispatcher(storage=MemoryStorage())
 dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
 
-# @dp.message(F.from_user.id.in_(ADMIN_USER_IDS), filters.Command('start'))
-# async def manager_start(message: types.Message):
-#     await message.answer('Доборое утро менеджер!', reply_markup=get_admin_keyboard())
 
 class ServiceState(StatesGroup):
     name = State()
@@ -48,7 +45,7 @@ async def new_app_admin(client):
 @dp.message(F.from_user.id.in_(ADMIN_USER_IDS), filters.Command('start'))
 async def admin_start(message: types.Message, state: FSMContext):
     state.clear()
-    await message.answer('test', reply_markup=get_admin_keyboard())
+    await message.answer('Доборое утро менеджер!', reply_markup=get_admin_keyboard())
 
 
 
@@ -56,7 +53,7 @@ async def admin_start(message: types.Message, state: FSMContext):
 async def start(message: types.Message, session: Session):
     sql = fn_count(select(Clients.id).where(Clients.id==message.from_user.id))
     q = await session.execute(statement=sql)
-    in_base = q.scalar() > 0
+    in_base = (q.scalar() > 0)
     await message.answer(f"Привет, {message.from_user.full_name}. Это бот для записи к косметологу! Начни знакомство со списка услуг. Так же можешь записаться на приём к косметологу. Для этого тебе необходимо поделиться контактом с этим ботом!", reply_markup=get_standart_keyboard(in_base=in_base))
 
 
