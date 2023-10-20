@@ -9,7 +9,6 @@ from db import sessionmaker
 from middlewares.db import DbSessionMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession as Session
 from sqlalchemy import text, select
-from sqlalchemy.sql.functions import count as fn_count
 from models import Clients, Services
 import datetime
 from sqlalchemy.exc import IntegrityError
@@ -44,16 +43,15 @@ async def new_app_admin(client):
 
 @dp.message(F.from_user.id.in_(ADMIN_USER_IDS), filters.Command('start'))
 async def admin_start(message: types.Message, state: FSMContext):
-    state.clear()
+    await state.clear()
     await message.answer('Доборое утро менеджер!', reply_markup=get_admin_keyboard())
 
 
 
 @dp.message(filters.Command('start'))
 async def start(message: types.Message, session: Session):
-    sql = fn_count(select(Clients.id).where(Clients.id==message.from_user.id))
-    q = await session.execute(statement=sql)
-    in_base = (q.scalar() > 0)
+    q = await session.execute(statement=text(f'SELECT COUNT(*) as cnt FROM clients WHERE clients.id == {str(message.from_user.id)}'))
+    in_base = q.first().cnt > 0
     await message.answer(f"Привет, {message.from_user.full_name}. Это бот для записи к косметологу! Начни знакомство со списка услуг. Так же можешь записаться на приём к косметологу. Для этого тебе необходимо поделиться контактом с этим ботом!", reply_markup=get_standart_keyboard(in_base=in_base))
 
 
